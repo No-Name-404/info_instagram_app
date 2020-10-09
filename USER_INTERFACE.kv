@@ -1,0 +1,140 @@
+#:import Clipboard kivy.core.clipboard.Clipboard
+#:import toast kivymd.toast.toast
+#:import escape_markup kivy.utils.escape_markup
+#:import hex kivy.utils.get_color_from_hex
+#:import get_sessionid InstaApi.get_sessionid
+
+<Loading>:
+    MDFloatLayout:
+        id:box
+        pos_hint:{'center_x':.5,'center_y':.5}
+        size_hint:.8,None
+        height:dp(100)
+        md_bg_color:app.theme_cls.bg_normal
+        radius:[dp(10)]*4
+
+        MDProgressBar:
+            id:loading
+            pos_hint:{'center_x':.5,'center_y':.5}
+            size_hint_x:None
+            width:box.width-dp(30)
+            max:13
+            value:0
+
+        MDLabel:
+            size_hint_y:None
+            height:dp(15)
+            halign:'center'
+            pos_hint:{'center_x':.5}
+            pos:0,box.pos[1]+box.height-self.height-dp(15)
+            text:'[b]Loading[/b]'
+            markup:True
+            font_size:sp(20)
+            theme_text_color:'Primary'
+
+        MDLabel:
+            size_hint:None,None
+            size:dp(48),dp(15)
+            halign:'center'
+            pos:box.width-self.width,box.pos[1]+dp(20)
+            text:str(int(loading.value))+'/'+str(int(loading.max))
+            theme_text_color:'Hint'
+            theme_text_color:'Primary'
+
+<BoxData>:
+    orientation:'vertical'
+    size_hint_y:None
+    adaptive_height:True
+    MDFloatLayout:
+        id:_title
+        size_hint_y:None
+        height:dp(40)
+        radius:[dp(10),dp(10),0,0]
+        md_bg_color:app.theme_cls.bg_dark
+        MDLabel:
+            text:root.info
+            size_hint_y:None
+            height:dp(30)
+            pos_hint:{'center_y':.5}
+            theme_text_color:'Primary'
+            halign:'center'
+        MDIconButton:
+            pos_hint:{'center_y':.5}
+            pos:_title.pos[0]+_title.width-self.width,0
+            icon:'content-copy'
+            font_size:dp(15)
+            on_release:
+                Clipboard.copy(escape_markup(data_label.text))
+                toast('copy')
+
+    MDBoxLayout:
+        md_bg_color:app.theme_cls.bg_light
+        radius:0,0,dp(10),dp(10)
+        adaptive_height:True
+        padding:dp(5)
+
+        MDLabel:
+            id:data_label
+            text:root.data
+            size_hint_y:None
+            height:self.texture_size[1]
+            markup:True
+
+<TextInput>:
+    background_normal:''
+    background_down:''
+    multiline:False
+    padding_y: [self.height / 3.0 - (self.line_height / 2.0) * len(self._lines), 0]
+    background_color:0,0,0,0
+    font_size:sp(11)
+
+<InputUserPass>:
+    MDFloatLayout:
+        id:box
+        #pos_hint:{'center_x':.5,'center_y':.5}
+        md_bg_color:app.theme_cls.bg_light
+        size_hint:.8,None
+        height:dp(300)
+        radius:[dp(20)]
+
+        Image:
+            pos_hint:{'center_x':.5}
+            source:'./assets/600px-Instagram_icon.png'
+            size_hint:None,None
+            size:dp(70),dp(70)
+            pos:0,box.pos[1]+box.height-self.height-dp(30)
+
+        MDBoxLayout:
+            md_bg_color:hex('#eaeded')
+            radius:[dp(5)]
+            size_hint:None,None
+            height:dp(38)
+            width:box.width-dp(30)
+            pos_hint:{'center_x':.5}
+            pos:0,box.pos[1]+box.height-self.height-dp(140)
+            TextInput:
+                id:username
+                hint_text:'Phone number, username, or email'
+
+        MDBoxLayout:
+            md_bg_color:hex('#eaeded')
+            radius:[dp(5)]
+            size_hint:None,None
+            height:dp(38)
+            width:box.width-dp(30)
+            pos_hint:{'center_x':.5}
+            pos:0,box.pos[1]+box.height-self.height-dp(185)
+            TextInput:
+                id:_password
+                hint_text:'Password'
+                password_mask:'●'
+                password:True
+                font_name:'./fonts/NotoSans-Bold.ttf'
+
+        MDRaisedButton:
+            pos_hint:{'center_x':.5}
+            pos:0,box.pos[1]+box.height-self.height-dp(240)
+            size_hint_x:.9
+            text:'Get my info'
+            on_release:
+                root.start_thread()
